@@ -1,11 +1,24 @@
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
+const BASE_URL = '/api'
 
 async function request(endpoint, options = {}) {
+  const token = localStorage.getItem('ss_token')
+
+  const headers = {
+    'Content-Type': 'application/json',
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...options.headers,
+  }
+
   const res = await fetch(`${BASE_URL}${endpoint}`, {
-    headers: { 'Content-Type': 'application/json', ...options.headers },
     ...options,
+    headers,
   })
-  if (!res.ok) throw new Error(`API error: ${res.status}`)
+
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({ message: `API error: ${res.status}` }))
+    throw new Error(error.message || `API error: ${res.status}`)
+  }
+
   return res.json()
 }
 
