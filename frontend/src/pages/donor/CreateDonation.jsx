@@ -14,6 +14,21 @@ const STEPS = [
 
 const UNITS = ['kg', 'portions', 'boxes', 'plates', 'liters', 'packets'];
 
+const inputCls = (err) =>
+  `w-full px-4 py-3 rounded-xl border-2 text-slate-900 text-sm bg-white transition-all outline-none focus:ring-2 focus:ring-primary-300 ${
+    err ? 'border-red-300 focus:border-red-400' : 'border-slate-200 focus:border-primary-500'
+  }`;
+
+function FormField({ label, error, children }) {
+  return (
+    <div>
+      <label className="block text-sm font-semibold text-slate-700 mb-1.5">{label}</label>
+      {children}
+      {error && <p className="mt-1 text-xs text-red-500 font-medium">{error}</p>}
+    </div>
+  );
+}
+
 export default function CreateDonation() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
@@ -107,19 +122,6 @@ export default function CreateDonation() {
     exit: (d) => ({ opacity: 0, x: d > 0 ? -40 : 40, transition: { duration: 0.2 } }),
   };
 
-  const Input = ({ label, error, children }) => (
-    <div>
-      <label className="block text-sm font-semibold text-slate-700 mb-1.5">{label}</label>
-      {children}
-      {error && <p className="mt-1 text-xs text-red-500 font-medium">{error}</p>}
-    </div>
-  );
-
-  const inputCls = (err) =>
-    `w-full px-4 py-3 rounded-xl border-2 text-slate-900 text-sm bg-white transition-all outline-none focus:ring-2 focus:ring-primary-300 ${
-      err ? 'border-red-300 focus:border-red-400' : 'border-slate-200 focus:border-primary-500'
-    }`;
-
   const renderStep = () => {
     switch (step) {
       case 1:
@@ -159,30 +161,30 @@ export default function CreateDonation() {
               <h2 className="text-2xl font-extrabold text-slate-900 mb-1">Tell us about the food</h2>
               <p className="text-slate-400 text-sm">Help NGOs understand what's available</p>
             </div>
-            <Input label="Food Name *" error={errors.foodName}>
+            <FormField label="Food Name *" error={errors.foodName}>
               <input value={form.foodName} onChange={e => set('foodName', e.target.value)}
                 placeholder="e.g. Dal Rice, Bread Packets" className={inputCls(errors.foodName)} />
-            </Input>
-            <Input label="Description" error={errors.description}>
+            </FormField>
+            <FormField label="Description" error={errors.description}>
               <textarea value={form.description} onChange={e => set('description', e.target.value)}
                 rows={3} placeholder="Any details about the food..."
                 className={inputCls(errors.description) + ' resize-none'} />
-            </Input>
+            </FormField>
             <div className="grid grid-cols-2 gap-4">
-              <Input label="Quantity *" error={errors.quantity}>
+              <FormField label="Quantity *" error={errors.quantity}>
                 <input type="number" value={form.quantity} onChange={e => set('quantity', e.target.value)}
                   placeholder="e.g. 10" className={inputCls(errors.quantity)} />
-              </Input>
-              <Input label="Unit">
+              </FormField>
+              <FormField label="Unit">
                 <select value={form.quantityUnit} onChange={e => set('quantityUnit', e.target.value)} className={inputCls('')}>
                   {UNITS.map(u => <option key={u}>{u}</option>)}
                 </select>
-              </Input>
+              </FormField>
             </div>
-            <Input label="Estimated Servings">
+            <FormField label="Estimated Servings">
               <input type="number" value={form.servesPeople} onChange={e => set('servesPeople', e.target.value)}
                 placeholder="How many people can this feed?" className={inputCls('')} />
-            </Input>
+            </FormField>
           </div>
         );
       case 3:
@@ -193,14 +195,14 @@ export default function CreateDonation() {
               <p className="text-slate-400 text-sm">This helps us arrange timely pickup</p>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <Input label="Expiry Date *" error={errors.expiryDate}>
+              <FormField label="Expiry Date *" error={errors.expiryDate}>
                 <input type="date" value={form.expiryDate} onChange={e => set('expiryDate', e.target.value)}
                   min={new Date().toISOString().split('T')[0]} className={inputCls(errors.expiryDate)} />
-              </Input>
-              <Input label="Expiry Time *" error={errors.expiryTime}>
+              </FormField>
+              <FormField label="Expiry Time *" error={errors.expiryTime}>
                 <input type="time" value={form.expiryTime} onChange={e => set('expiryTime', e.target.value)}
                   className={inputCls(errors.expiryTime)} />
-              </Input>
+              </FormField>
             </div>
             <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-sm text-amber-700 font-medium">
               ⏰ Set a realistic expiry time — NGOs need enough time to arrange pickup
@@ -214,28 +216,28 @@ export default function CreateDonation() {
               <h2 className="text-2xl font-extrabold text-slate-900 mb-1">Where should we pick it up?</h2>
               <p className="text-slate-400 text-sm">Exact address for the volunteer</p>
             </div>
-            <Input label="Address Line 1 *" error={errors.addressLine1}>
+            <FormField label="Address Line 1 *" error={errors.addressLine1}>
               <input value={form.addressLine1} onChange={e => set('addressLine1', e.target.value)}
                 placeholder="Building, street, area" className={inputCls(errors.addressLine1)} />
-            </Input>
-            <Input label="Address Line 2">
+            </FormField>
+            <FormField label="Address Line 2">
               <input value={form.addressLine2} onChange={e => set('addressLine2', e.target.value)}
                 placeholder="Landmark, floor, etc." className={inputCls('')} />
-            </Input>
+            </FormField>
             <div className="grid grid-cols-2 gap-4">
-              <Input label="City *" error={errors.city}>
+              <FormField label="City *" error={errors.city}>
                 <input value={form.city} onChange={e => set('city', e.target.value)}
                   placeholder="City" className={inputCls(errors.city)} />
-              </Input>
-              <Input label="State">
+              </FormField>
+              <FormField label="State">
                 <input value={form.state} onChange={e => set('state', e.target.value)}
                   placeholder="State" className={inputCls('')} />
-              </Input>
+              </FormField>
             </div>
-            <Input label="Pincode *" error={errors.pincode}>
+            <FormField label="Pincode *" error={errors.pincode}>
               <input value={form.pincode} onChange={e => set('pincode', e.target.value)}
                 placeholder="6-digit pincode" maxLength={6} className={inputCls(errors.pincode)} />
-            </Input>
+            </FormField>
           </div>
         );
       default: return null;
