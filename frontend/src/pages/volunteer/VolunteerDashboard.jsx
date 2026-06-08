@@ -1,10 +1,8 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import {
-  ArrowRight,
   CheckCircle2,
   Clock3,
-  Loader2,
   MapPin,
   Navigation,
   Package,
@@ -24,12 +22,6 @@ import { staggerContainer, staggerItem } from '../../design-system/animations/va
 const fadeUp = {
   initial: { opacity: 0, y: 18 },
   animate: { opacity: 1, y: 0, transition: { duration: 0.35 } },
-};
-
-const AVAILABILITY_STYLES = {
-  AVAILABLE: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-  BUSY: 'bg-amber-50 text-amber-700 border-amber-200',
-  OFFLINE: 'bg-slate-50 text-slate-600 border-slate-200',
 };
 
 const ASSIGNMENT_STYLES = {
@@ -129,7 +121,7 @@ export default function VolunteerDashboard() {
   const availableAssignments = dashboard?.availableAssignments || [];
   const activeAssignments = dashboard?.activeAssignments || [];
   const recentActivity = dashboard?.recentActivity || [];
-  const primaryRoute = useMemo(() => activeAssignments[0] || availableAssignments[0] || null, [activeAssignments, availableAssignments]);
+  const primaryRoute = activeAssignments[0] || availableAssignments[0] || null;
 
   async function refresh() {
     const data = await volunteerService.dashboard();
