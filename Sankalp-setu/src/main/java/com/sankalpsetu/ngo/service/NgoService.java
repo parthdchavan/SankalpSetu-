@@ -179,6 +179,10 @@ public class NgoService {
         response.setExpiryTime(donation.getExpiryTime());
         response.setStatus(donation.getStatus().name());
         response.setDonorName(donation.getDonor() != null ? donation.getDonor().getFirstName() + " " + safeLastName(donation.getDonor()) : null);
+        if (donation.getDonor() != null) {
+            response.setDonorEmail(donation.getDonor().getEmail());
+            response.setDonorPhone(donation.getDonor().getPhone());
+        }
         if (donation.getPickupAddress() != null) {
             response.setCity(donation.getPickupAddress().getCity());
             response.setAddressLine1(donation.getPickupAddress().getAddressLine1());
@@ -200,6 +204,10 @@ public class NgoService {
             response.setQuantity(assignment.getDonation().getQuantity());
             response.setQuantityUnit(assignment.getDonation().getQuantityUnit());
             response.setDonorName(assignment.getDonation().getDonor() != null ? assignment.getDonation().getDonor().getFirstName() + " " + safeLastName(assignment.getDonation().getDonor()) : null);
+            if (assignment.getDonation().getDonor() != null) {
+                response.setDonorEmail(assignment.getDonation().getDonor().getEmail());
+                response.setDonorPhone(assignment.getDonation().getDonor().getPhone());
+            }
             if (assignment.getDonation().getPickupAddress() != null) {
                 response.setCity(assignment.getDonation().getPickupAddress().getCity());
                 response.setAddressLine1(assignment.getDonation().getPickupAddress().getAddressLine1());
@@ -209,6 +217,10 @@ public class NgoService {
         response.setVolunteerName(assignment.getVolunteer() != null && assignment.getVolunteer().getUser() != null
                 ? assignment.getVolunteer().getUser().getFirstName() + " " + safeLastName(assignment.getVolunteer().getUser())
                 : null);
+        if (assignment.getVolunteer() != null && assignment.getVolunteer().getUser() != null) {
+            response.setVolunteerEmail(assignment.getVolunteer().getUser().getEmail());
+            response.setVolunteerPhone(assignment.getVolunteer().getUser().getPhone());
+        }
         response.setStatus(assignment.getStatus().name());
         response.setAssignedAt(assignment.getAssignedAt());
         response.setPickupTime(assignment.getPickupTime());
@@ -224,6 +236,9 @@ public class NgoService {
         response.setDonorName(request.getDonation() != null && request.getDonation().getDonor() != null
                 ? request.getDonation().getDonor().getFirstName() + " " + safeLastName(request.getDonation().getDonor())
                 : null);
+        if (request.getDonation() != null && request.getDonation().getDonor() != null) {
+            response.setDonorPhone(request.getDonation().getDonor().getPhone());
+        }
         response.setRequestStatus(request.getRequestStatus().name());
         response.setCreatedAt(request.getCreatedAt());
         if (request.getDonation() != null && request.getDonation().getPickupAddress() != null) {
