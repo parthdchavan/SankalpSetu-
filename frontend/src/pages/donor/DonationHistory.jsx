@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Package, Calendar, MapPin, Search, Heart, ArrowRight, Filter } from 'lucide-react';
+import { Package, Calendar, MapPin, Search, Heart, ArrowRight } from 'lucide-react';
 import DashboardSidebar from '../../components/dashboard/DashboardSidebar';
 import { donationService } from '../../services/donationService';
 

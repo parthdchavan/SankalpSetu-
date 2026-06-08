@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, LayoutDashboard, Plus, Clock, LogOut, Menu, Bell, User } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
+import { Heart, LayoutDashboard, Plus, Clock, LogOut, Menu, Bell } from 'lucide-react';
+import { useAuth } from '../../context/useAuth';
 
 const donorNav = [
   { to: '/donor/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
@@ -10,14 +10,8 @@ const donorNav = [
   { to: '/donor/history',   icon: Clock,           label: 'History' },
 ];
 
-export default function DashboardSidebar({ children }) {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
-  const [open, setOpen] = useState(false);
-
-  const handleLogout = () => { logout(); navigate('/'); };
-
-  const Nav = ({ onClose }) => (
+function SidebarNav({ user, onClose, onLogout }) {
+  return (
     <div className="flex flex-col h-full">
       <div className="flex items-center gap-3 px-6 py-5 border-b border-white/10">
         <div className="w-9 h-9 bg-white rounded-xl flex items-center justify-center shadow">
@@ -54,19 +48,27 @@ export default function DashboardSidebar({ children }) {
       </nav>
 
       <div className="px-3 py-4 border-t border-white/10">
-        <button onClick={handleLogout}
+        <button onClick={onLogout}
           className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium text-primary-200 hover:bg-white/10 hover:text-white transition-all">
           <LogOut className="w-5 h-5" /> Sign out
         </button>
       </div>
     </div>
   );
+  }
+
+export default function DashboardSidebar({ children }) {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
+
+  const handleLogout = () => { logout(); navigate('/'); };
 
   return (
     <div className="min-h-screen bg-slate-50 flex">
       {/* Desktop sidebar */}
       <aside className="hidden lg:flex flex-col w-64 bg-gradient-to-b from-primary-700 to-primary-900 fixed inset-y-0 left-0 z-30 shadow-2xl">
-        <Nav onClose={() => {}} />
+        <SidebarNav user={user} onClose={() => {}} onLogout={handleLogout} />
       </aside>
 
       {/* Mobile overlay */}
@@ -78,7 +80,7 @@ export default function DashboardSidebar({ children }) {
             <motion.aside initial={{ x: -280 }} animate={{ x: 0 }} exit={{ x: -280 }}
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
               className="fixed inset-y-0 left-0 w-72 bg-gradient-to-b from-primary-700 to-primary-900 z-50 lg:hidden shadow-2xl">
-              <Nav onClose={() => setOpen(false)} />
+              <SidebarNav user={user} onClose={() => setOpen(false)} onLogout={handleLogout} />
             </motion.aside>
           </>
         )}

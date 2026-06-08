@@ -1,26 +1,24 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useState } from 'react';
 
-const AuthContext = createContext(null);
+export const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [token, setToken] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const savedToken = localStorage.getItem('ss_token');
+  const [user, setUser] = useState(() => {
     const savedUser = localStorage.getItem('ss_user');
-    if (savedToken && savedUser) {
-      try {
-        setToken(savedToken);
-        setUser(JSON.parse(savedUser));
-      } catch {
-        localStorage.removeItem('ss_token');
-        localStorage.removeItem('ss_user');
-      }
+    if (!savedUser) {
+      return null;
     }
-    setLoading(false);
-  }, []);
+
+    try {
+      return JSON.parse(savedUser);
+    } catch {
+      localStorage.removeItem('ss_token');
+      localStorage.removeItem('ss_user');
+      return null;
+    }
+  });
+  const [token, setToken] = useState(() => localStorage.getItem('ss_token'));
+  const [loading] = useState(false);
 
   const login = (userData, jwtToken) => {
     setUser(userData);
@@ -54,5 +52,3 @@ export function AuthProvider({ children }) {
     </AuthContext.Provider>
   );
 }
-
-export const useAuth = () => useContext(AuthContext);

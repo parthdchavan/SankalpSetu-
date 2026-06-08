@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, Mail, Lock, User, Building2, HandHeart, CheckCircle2, ArrowRight } from 'lucide-react';
+import { Heart, Mail, Lock, User, Building2, HandHeart, ArrowRight } from 'lucide-react';
 import { Button } from '../design-system/components/Button';
 import { Input } from '../design-system/components/Input';
 import { fadeIn, slideUp, slideInFromRight } from '../design-system/animations';
 import { authService } from '../services/authService';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 
 /**
  * Register Page - Production-quality signup with role selection

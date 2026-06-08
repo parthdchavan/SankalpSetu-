@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Heart, Users, MapPin, TrendingUp, ArrowRight, CheckCircle2, Sparkles } from 'lucide-react';
 import { Button } from '../design-system/components/Button';
-import { fadeIn, slideUp, staggerContainer, staggerItem } from '../design-system/animations';
+import { fadeIn, staggerContainer, staggerItem } from '../design-system/animations';
 
 /**
  * Landing Page - Production-quality homepage

@@ -57,7 +57,7 @@ export default function DonationDetails() {
       .then(setDonation)
       .catch(() => navigate('/donor/history'))
       .finally(() => setLoading(false));
-  }, [id]);
+  }, [id, navigate]);
 
   const handleCancel = async () => {
     setCancelling(true);
@@ -86,8 +86,6 @@ export default function DonationDetails() {
   const s = STATUS[donation.status] || STATUS.PENDING;
   const currentStep = s.step || 0;
   const icon = FOOD_ICONS[donation.foodCategory] || '🍽️';
-  const isTerminal = ['DELIVERED', 'EXPIRED', 'CANCELLED'].includes(donation.status);
-
   return (
     <DashboardSidebar>
       <motion.div initial="initial" animate="animate" variants={stagger} className="max-w-3xl mx-auto space-y-6">

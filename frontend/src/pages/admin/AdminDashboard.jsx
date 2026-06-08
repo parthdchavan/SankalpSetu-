@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Users, Building2, Package, TrendingUp, ShieldCheck, AlertTriangle } from 'lucide-react';
+import { Users, Building2, Package, TrendingUp, ShieldCheck } from 'lucide-react';
 import { staggerContainer, staggerItem } from '../../design-system/animations/variants';
 
 const stats = [
