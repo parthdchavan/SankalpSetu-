@@ -33,7 +33,8 @@ const Input = ({
   ...props
 }) => {
   const [showPassword, setShowPassword] = useState(false);
-  const inputId = id || name || `input-${useId().replace(/:/g, '')}`;
+  const generatedId = useId().replace(/:/g, '');
+  const inputId = id || name || `input-${generatedId}`;
   const errorId = `${inputId}-error`;
   const hintId = `${inputId}-hint`;
 
