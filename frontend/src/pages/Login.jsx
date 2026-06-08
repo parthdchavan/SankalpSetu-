@@ -6,7 +6,7 @@ import { Button } from '../design-system/components/Button';
 import { Input } from '../design-system/components/Input';
 import { fadeIn, slideUp } from '../design-system/animations';
 import { authService } from '../services/authService';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 
 /**
  * Login Page - Production-quality authentication

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { AlertCircle, CheckCircle2, Eye, EyeOff } from 'lucide-react';
 import { clsx } from 'clsx';
 
@@ -33,9 +33,7 @@ const Input = ({
   ...props
 }) => {
   const [showPassword, setShowPassword] = useState(false);
-  const [isFocused, setIsFocused] = useState(false);
-
-  const inputId = id || name || `input-${Math.random().toString(36).substr(2, 9)}`;
+  const inputId = id || name || `input-${useId().replace(/:/g, '')}`;
   const errorId = `${inputId}-error`;
   const hintId = `${inputId}-hint`;
 
@@ -91,8 +89,6 @@ const Input = ({
           disabled={disabled}
           required={required}
           onChange={handleChange}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
           className={clsx(
             // Base styles
             'w-full px-4 py-2.5',

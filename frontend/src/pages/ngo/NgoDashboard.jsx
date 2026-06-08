@@ -22,7 +22,7 @@ import {
   Navigation,
   Map,
 } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../context/useAuth';
 import { ngoService } from '../../services/ngoService';
 import { staggerContainer, staggerItem } from '../../design-system/animations/variants';
 

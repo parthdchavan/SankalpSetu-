@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Heart, Plus, Package, Clock, CheckCircle2, ArrowRight, Sparkles, TrendingUp, MapPin, Calendar } from 'lucide-react';
+import { Heart, Plus, Package, Clock, CheckCircle2, ArrowRight, Sparkles, MapPin, Calendar } from 'lucide-react';
 import DashboardSidebar from '../../components/dashboard/DashboardSidebar';
 import { donationService } from '../../services/donationService';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../context/useAuth';
 
 const stagger = { animate: { transition: { staggerChildren: 0.07 } } };
 const fadeUp = { initial: { opacity: 0, y: 20 }, animate: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
