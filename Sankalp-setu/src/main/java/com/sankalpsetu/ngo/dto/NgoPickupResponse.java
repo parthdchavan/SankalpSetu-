@@ -16,7 +16,11 @@ public class NgoPickupResponse {
     private Integer quantity;
     private String quantityUnit;
     private String donorName;
+    private String donorEmail;
+    private String donorPhone;
     private String volunteerName;
+    private String volunteerEmail;
+    private String volunteerPhone;
     private String status;
     private LocalDateTime assignedAt;
     private LocalDateTime pickupTime;

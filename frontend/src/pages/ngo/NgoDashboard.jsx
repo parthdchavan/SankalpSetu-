@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import {
   ArrowRight,
   Building2,
+  Copy,
   CheckCircle2,
   Clock3,
   Loader2,
@@ -14,6 +15,12 @@ import {
   Truck,
   Users,
   XCircle,
+  Search,
+  Filter,
+  Phone,
+  Mail,
+  Navigation,
+  Map,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { ngoService } from '../../services/ngoService';
@@ -35,6 +42,13 @@ const PICKUP_STYLES = {
   PICKED_UP: 'bg-violet-50 text-violet-700 border-violet-200',
   DELIVERED: 'bg-emerald-50 text-emerald-700 border-emerald-200',
 };
+
+const DISTANCE_FILTERS = [
+  { key: 'all', label: 'All nearby' },
+  { key: 'high', label: 'High urgency' },
+  { key: 'medium', label: 'Medium urgency' },
+  { key: 'near', label: 'Within 5 km' },
+];
 
 function formatDateTime(value) {
   if (!value) return 'Not scheduled yet';
@@ -81,6 +95,8 @@ export default function NgoDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [savingId, setSavingId] = useState(null);
+  const [search, setSearch] = useState('');
+  const [distanceFilter, setDistanceFilter] = useState('all');
 
   useEffect(() => {
     let mounted = true;
@@ -135,6 +151,26 @@ export default function NgoDashboard() {
 
   const isVerified = dashboard?.canAcceptDonations;
   const greetingName = dashboard?.organizationName || user?.firstName || 'your NGO';
+  const filteredDonations = useMemo(() => {
+    const items = dashboard?.nearbyDonations || [];
+    return items.filter((donation) => {
+      const haystack = [
+        donation.foodName,
+        donation.foodCategory,
+        donation.city,
+        donation.addressLine1,
+        donation.donorName,
+      ].filter(Boolean).join(' ').toLowerCase();
+      const matchesSearch = !search || haystack.includes(search.toLowerCase());
+      const matchesDistance = distanceFilter === 'all'
+        || (distanceFilter === 'near' && (donation.distanceKm ?? 999) <= 5)
+        || (distanceFilter === 'high' && donation.urgencyLabel?.toLowerCase().includes('high'))
+        || (distanceFilter === 'medium' && donation.urgencyLabel?.toLowerCase().includes('medium'));
+      return matchesSearch && matchesDistance;
+    });
+  }, [dashboard?.nearbyDonations, search, distanceFilter]);
+
+  const topMapDonations = filteredDonations.slice(0, 4);
 
   return (
     <div className="min-h-screen bg-[#f6f7f2] text-slate-900">
@@ -220,6 +256,73 @@ export default function NgoDashboard() {
             </div>
 
             <div className="p-4 sm:p-6 space-y-4">
+              <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
+                <div className="rounded-3xl border border-slate-100 bg-slate-50 p-4 sm:p-5 space-y-4">
+                  <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                    <Search className="h-4 w-4 text-slate-400" />
+                    Search and filters
+                  </div>
+                  <div className="relative">
+                    <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                    <input
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                      placeholder="Search food, donor, city, address"
+                      className="w-full rounded-2xl border border-slate-200 bg-white py-3 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-100"
+                    />
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {DISTANCE_FILTERS.map((item) => (
+                      <button
+                        key={item.key}
+                        type="button"
+                        onClick={() => setDistanceFilter(item.key)}
+                        className={`inline-flex items-center gap-1 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${distanceFilter === item.key ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-slate-200 bg-white text-slate-600 hover:border-emerald-200 hover:text-emerald-700'}`}
+                      >
+                        <Filter className="h-3.5 w-3.5" />
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="rounded-3xl border border-slate-100 bg-gradient-to-br from-slate-900 via-slate-800 to-emerald-800 p-4 sm:p-5 text-white overflow-hidden relative">
+                  <div className="absolute -right-8 -top-8 h-28 w-28 rounded-full bg-white/10 blur-2xl" />
+                  <div className="absolute -left-6 bottom-0 h-24 w-24 rounded-full bg-emerald-400/20 blur-2xl" />
+                  <div className="relative flex items-center justify-between gap-3">
+                    <div>
+                      <div className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-50">
+                        <Map className="h-3.5 w-3.5" />
+                        Map preview
+                      </div>
+                      <h3 className="mt-3 text-lg font-bold">Coverage snapshot</h3>
+                      <p className="mt-1 text-sm text-emerald-50/90">A quick visual cue for the closest donations in your filtered queue.</p>
+                    </div>
+                    <div className="rounded-2xl bg-white/10 p-3">
+                      <Navigation className="h-6 w-6 text-white" />
+                    </div>
+                  </div>
+                  <div className="relative mt-5 grid gap-3">
+                    {topMapDonations.length ? topMapDonations.map((donation, index) => (
+                      <div key={donation.donationId} className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/8 px-3 py-2.5 backdrop-blur-sm">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white text-sm font-black text-slate-900">{index + 1}</div>
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-semibold">{donation.foodName}</p>
+                          <p className="truncate text-xs text-emerald-50/80">{donation.distanceLabel} · {donation.urgencyLabel}</p>
+                        </div>
+                        <div className="rounded-xl bg-white/10 p-2 text-emerald-50">
+                          <MapPin className="h-4 w-4" />
+                        </div>
+                      </div>
+                    )) : (
+                      <div className="rounded-2xl border border-dashed border-white/20 bg-white/5 px-4 py-8 text-sm text-emerald-50/80">
+                        No donations match the current filters.
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
               {loading ? (
                 <div className="space-y-4">
                   {[1, 2, 3].map((item) => (
@@ -235,9 +338,11 @@ export default function NgoDashboard() {
                     </div>
                   ))}
                 </div>
-              ) : dashboard?.nearbyDonations?.length ? (
-                dashboard.nearbyDonations.map((donation) => {
+              ) : filteredDonations.length ? (
+                filteredDonations.map((donation) => {
                   const accepting = savingId === donation.donationId;
+                  const donorPhone = donation.donorPhone ? `tel:${donation.donorPhone}` : null;
+                  const donorEmail = donation.donorEmail ? `mailto:${donation.donorEmail}` : null;
                   return (
                     <motion.div key={donation.donationId} variants={staggerItem} whileHover={{ y: -2 }} className="rounded-3xl border border-slate-100 bg-slate-50/70 p-5 transition-shadow hover:shadow-md">
                       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
@@ -285,6 +390,33 @@ export default function NgoDashboard() {
                             Reject
                           </button>
                         </div>
+                      </div>
+
+                      <div className="mt-4 flex flex-wrap gap-2 border-t border-slate-200 pt-4">
+                        <a
+                          href={donorPhone || undefined}
+                          onClick={(event) => !donorPhone && event.preventDefault()}
+                          className={`inline-flex items-center gap-2 rounded-2xl px-3 py-2 text-xs font-semibold transition ${donorPhone ? 'bg-white text-slate-700 hover:bg-slate-100' : 'cursor-not-allowed bg-slate-100 text-slate-400'}`}
+                        >
+                          <Phone className="h-3.5 w-3.5" />
+                          Call donor
+                        </a>
+                        <a
+                          href={donorEmail ? donorEmail : '#'}
+                          onClick={(event) => !donorEmail && event.preventDefault()}
+                          className={`inline-flex items-center gap-2 rounded-2xl px-3 py-2 text-xs font-semibold transition ${donorEmail ? 'bg-white text-slate-700 hover:bg-slate-100' : 'cursor-not-allowed bg-slate-100 text-slate-400'}`}
+                        >
+                          <Mail className="h-3.5 w-3.5" />
+                          Email donor
+                        </a>
+                        <button
+                          type="button"
+                          onClick={() => navigator.clipboard?.writeText(`${donation.addressLine1 || ''}${donation.city ? `, ${donation.city}` : ''}`)}
+                          className="inline-flex items-center gap-2 rounded-2xl bg-white px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100"
+                        >
+                          <Copy className="h-3.5 w-3.5" />
+                          Copy pickup address
+                        </button>
                       </div>
                     </motion.div>
                   );
@@ -334,6 +466,33 @@ export default function NgoDashboard() {
                         <div className="flex items-start gap-2"><MapPin className="mt-0.5 h-4 w-4 flex-shrink-0 text-slate-400" /><span>{pickup.addressLine1 || 'Pickup address unavailable'}{pickup.city ? `, ${pickup.city}` : ''}</span></div>
                         <div className="flex items-start gap-2"><Truck className="mt-0.5 h-4 w-4 flex-shrink-0 text-slate-400" /><span>Volunteer: {pickup.volunteerName || 'Awaiting assignment'}</span></div>
                         <div className="flex items-start gap-2"><Clock3 className="mt-0.5 h-4 w-4 flex-shrink-0 text-slate-400" /><span>Assigned {formatDateTime(pickup.assignedAt)} · Pickup {formatDateTime(pickup.pickupTime)} · Delivered {formatDateTime(pickup.deliveredTime)}</span></div>
+                      </div>
+
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        <a
+                          href={pickup.donorPhone ? `tel:${pickup.donorPhone}` : undefined}
+                          onClick={(event) => !pickup.donorPhone && event.preventDefault()}
+                          className={`inline-flex items-center gap-2 rounded-2xl px-3 py-2 text-xs font-semibold transition ${pickup.donorPhone ? 'bg-white text-slate-700 hover:bg-slate-100' : 'cursor-not-allowed bg-slate-100 text-slate-400'}`}
+                        >
+                          <Phone className="h-3.5 w-3.5" />
+                          Call donor
+                        </a>
+                        <a
+                          href={pickup.volunteerPhone ? `tel:${pickup.volunteerPhone}` : undefined}
+                          onClick={(event) => !pickup.volunteerPhone && event.preventDefault()}
+                          className={`inline-flex items-center gap-2 rounded-2xl px-3 py-2 text-xs font-semibold transition ${pickup.volunteerPhone ? 'bg-white text-slate-700 hover:bg-slate-100' : 'cursor-not-allowed bg-slate-100 text-slate-400'}`}
+                        >
+                          <Phone className="h-3.5 w-3.5" />
+                          Call volunteer
+                        </a>
+                        <a
+                          href={pickup.volunteerEmail ? `mailto:${pickup.volunteerEmail}` : '#'}
+                          onClick={(event) => !pickup.volunteerEmail && event.preventDefault()}
+                          className={`inline-flex items-center gap-2 rounded-2xl px-3 py-2 text-xs font-semibold transition ${pickup.volunteerEmail ? 'bg-white text-slate-700 hover:bg-slate-100' : 'cursor-not-allowed bg-slate-100 text-slate-400'}`}
+                        >
+                          <Mail className="h-3.5 w-3.5" />
+                          Email volunteer
+                        </a>
                       </div>
                     </div>
                   ))

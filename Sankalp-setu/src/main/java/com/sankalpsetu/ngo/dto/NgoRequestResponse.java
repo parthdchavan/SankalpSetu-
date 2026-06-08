@@ -13,6 +13,7 @@ public class NgoRequestResponse {
     private UUID donationId;
     private String foodName;
     private String donorName;
+    private String donorPhone;
     private String requestStatus;
     private LocalDateTime createdAt;
     private String city;

@@ -19,6 +19,8 @@ public class NgoNearbyDonationResponse {
     private LocalDateTime expiryTime;
     private String status;
     private String donorName;
+    private String donorEmail;
+    private String donorPhone;
     private String city;
     private String addressLine1;
     private String distanceLabel;
