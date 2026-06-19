@@ -20,7 +20,10 @@ public class DonationResponse {
     private String status;
     private LocalDateTime createdAt;
     private String city;
+    private String state;
+    private String pincode;
     private String addressLine1;
+    private String addressLine2;
 
     public static DonationResponse from(Donation d) {
         DonationResponse r = new DonationResponse();
@@ -36,7 +39,10 @@ public class DonationResponse {
         r.setCreatedAt(d.getCreatedAt());
         if (d.getPickupAddress() != null) {
             r.setCity(d.getPickupAddress().getCity());
+            r.setState(d.getPickupAddress().getState());
+            r.setPincode(d.getPickupAddress().getPincode());
             r.setAddressLine1(d.getPickupAddress().getAddressLine1());
+            r.setAddressLine2(d.getPickupAddress().getAddressLine2());
         }
         return r;
     }
