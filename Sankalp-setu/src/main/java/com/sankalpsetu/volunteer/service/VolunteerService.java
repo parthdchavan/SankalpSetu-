@@ -20,7 +20,6 @@ import java.time.YearMonth;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -113,6 +112,9 @@ public class VolunteerService {
 
         assignment.setVolunteer(volunteer);
         assignment.setAssignedAt(assignment.getAssignedAt() != null ? assignment.getAssignedAt() : LocalDateTime.now());
+        if (assignment.getDonation() != null) {
+            assignment.getDonation().setStatus(com.sankalpsetu.donation.entity.Donation.DonationStatus.VOLUNTEER_ASSIGNED);
+        }
         pickupAssignmentRepository.save(assignment);
 
         volunteer.setAvailabilityStatus(Volunteer.AvailabilityStatus.BUSY);
@@ -134,6 +136,9 @@ public class VolunteerService {
 
         assignment.setStatus(PickupAssignment.AssignmentStatus.PICKED_UP);
         assignment.setPickupTime(LocalDateTime.now());
+        if (assignment.getDonation() != null) {
+            assignment.getDonation().setStatus(com.sankalpsetu.donation.entity.Donation.DonationStatus.PICKED_UP);
+        }
         pickupAssignmentRepository.save(assignment);
 
         VolunteerActionResponse response = new VolunteerActionResponse();
@@ -152,6 +157,9 @@ public class VolunteerService {
 
         assignment.setStatus(PickupAssignment.AssignmentStatus.DELIVERED);
         assignment.setDeliveredTime(LocalDateTime.now());
+        if (assignment.getDonation() != null) {
+            assignment.getDonation().setStatus(com.sankalpsetu.donation.entity.Donation.DonationStatus.DELIVERED);
+        }
         pickupAssignmentRepository.save(assignment);
 
         Volunteer volunteer = currentVolunteer();
@@ -235,6 +243,7 @@ public class VolunteerService {
             case ASSIGNED -> assignment.getDonation() != null ? assignment.getDonation().getFoodName() + " ready for pickup" : "Pickup ready";
             case PICKED_UP -> assignment.getDonation() != null ? assignment.getDonation().getFoodName() + " picked up" : "Pickup started";
             case DELIVERED -> assignment.getDonation() != null ? assignment.getDonation().getFoodName() + " delivered" : "Delivery completed";
+            default -> "Assignment updated";
         };
     }
 
@@ -270,6 +279,7 @@ public class VolunteerService {
             case ASSIGNED -> "border-blue-200 bg-blue-50 text-blue-700";
             case PICKED_UP -> "border-violet-200 bg-violet-50 text-violet-700";
             case DELIVERED -> "border-emerald-200 bg-emerald-50 text-emerald-700";
+            default -> "border-slate-200 bg-white text-slate-600";
         };
     }
 

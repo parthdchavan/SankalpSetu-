@@ -71,6 +71,10 @@ public class DonationService {
     public DonationResponse getById(UUID id) {
         Donation d = donationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Donation not found"));
+        User user = currentUser();
+        if (user.getRole() != User.Role.ADMIN && (d.getDonor() == null || !d.getDonor().getId().equals(user.getId()))) {
+            throw new RuntimeException("Donation access denied");
+        }
         return DonationResponse.from(d);
     }
 
@@ -99,6 +103,10 @@ public class DonationService {
     public void cancel(UUID id) {
         Donation d = donationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Donation not found"));
+        User user = currentUser();
+        if (d.getDonor() == null || !d.getDonor().getId().equals(user.getId())) {
+            throw new RuntimeException("Donation access denied");
+        }
         if (d.getStatus() != Donation.DonationStatus.PENDING)
             throw new RuntimeException("Only pending donations can be cancelled");
         d.setStatus(Donation.DonationStatus.CANCELLED);
